@@ -1,4 +1,5 @@
 #' @importFrom magrittr `%>%`
+#' @import readr dplyr
 
 table_to_tsv <- function(table, output.path) {
   utils::write.table(table, output.path, quote=FALSE, na="", sep="\t", row.names=FALSE)
@@ -9,7 +10,7 @@ read_sheet <- function(excel.path, sheet.name) {
 }
 
 sheet_to_tsv <- function(excel.path, sheet.name, output.path) {
-  if (sheet.name %in% excel_sheets(path=excel.path)) {
+  if (sheet.name %in% readxl::excel_sheets(path=excel.path)) {
     table <- read_sheet(excel.path, sheet.name)
     table_to_tsv(table, output.path)
   }
@@ -29,9 +30,34 @@ excel_to_template <- function(metadata_path, edi_filename, rights, bbox=FALSE, o
   sheet_to_tsv(excel_path, 'CustomUnits', 'custom_units.txt')
 
   # if there is no additional information (default), eliminate the template
+  # TODO determine if this is necessary
   if(isFALSE(other_info)) {
-    unlink(here("additional_info.txt"))
+    unlink(here::here("additional_info.txt"))
   }
+}
+
+# Define Coverage for make_eml ----------
+
+# date, lat, and lon columns must be identified as input for this function
+# Compiles a list of geographic and temporal coverage
+data_coverage <- function(dates, lat, lon) {
+  # Temporal coverage 
+  # Will need this in make_eml YYYY-MM-DD
+  startdate <- min(dates, na.rm = TRUE)
+  enddate <- max(dates, na.rm = TRUE)
+  # temporal.coverage argument is expecting objects of 'character' class, not 'Date'
+  startdate_as_character <- as.character(startdate)
+  enddate_as_character <- as.character(enddate)
+  
+  # Geographic coverage
+  # Will need this order in make_eml: North, East, South, West
+  North <- round(max(lat, na.rm = TRUE), 5)
+  East <- round(max(lon, na.rm = TRUE), 5)
+  South <- round(min(lat, na.rm = TRUE), 5)
+  West <- round(min(lon, na.rm = TRUE), 5)
+  
+  return(list("startdate" = startdate_as_character, "enddate" = enddate_as_character,
+              "North" = North, "East" = East, "South" = South, "West" = West))
 }
 
 merge_csv_directory <- function(dir) {

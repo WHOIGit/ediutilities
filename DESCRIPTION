@@ -2,7 +2,7 @@ Package: ediutilities
 Type: Package
 Title: Utilities For Working with the EMLAssemblyline Package
 Version: 0.1.0
-Author: Joe Futrelle, Jaxine Wolf
+Author: Joe Futrelle, Jaxine Wolfe
 Maintainer: Joe Futrelle <jfutrelle@whoi.edu>
 Description: Generates input for EML assembly line from templates
     and other sources.
@@ -11,6 +11,14 @@ Encoding: UTF-8
 LazyData: true
 Imports:
   tidyverse,
+  magrittr,
   readxl,
   here,
-  glue
+  glue,
+  dplyr,
+  readr,
+  EML,
+  EMLassemblyline
+Remotes:
+  EDIorg/EMLassemblyline
+RoxygenNote: 7.1.2
