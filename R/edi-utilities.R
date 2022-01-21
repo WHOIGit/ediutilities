@@ -1,5 +1,5 @@
 #' @importFrom magrittr `%>%`
-#' @import readr dplyr readxl xml2 plyr
+#' @import readr dplyr readxl xml2
 #' @import EML EMLassemblyline
 #' @import rjson
 
@@ -171,7 +171,7 @@ read_from_api <- function(type, cruises) {
       }
       
       # bind the next cruise to the compiled cruise dataset
-      all <- plyr::rbind.fill(prev_cruise, next_cruise)
+      all <- dplyr::bind_rows(prev_cruise, next_cruise)
       
       # if statment to reset the previous cruises until all cruises are read in
       if(k < length(urls)) {
