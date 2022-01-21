@@ -17,6 +17,7 @@ Imports:
   glue,
   dplyr,
   readr,
+  xml2,
   EML,
   EMLassemblyline
 Remotes:

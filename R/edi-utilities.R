@@ -1,5 +1,6 @@
 #' @importFrom magrittr `%>%`
-#' @import readr dplyr
+#' @import readr dplyr readxl xml2
+#' @import EML
 
 table_to_tsv <- function(table, output.path) {
   utils::write.table(table, output.path, quote=FALSE, na="", sep="\t", row.names=FALSE)
@@ -58,6 +59,43 @@ data_coverage <- function(dates, lat, lon) {
   
   return(list("startdate" = startdate_as_character, "enddate" = enddate_as_character,
               "North" = North, "East" = East, "South" = South, "West" = West))
+}
+# Insert Custom Project Node ------------
+# required packages: xml2
+
+# Function inserts project node after the methods node of an xml document
+# requires the existance of a parent_project.txt
+# input path to xml file
+
+project_insert <- function(edi_pkg) {
+  if (!file.exists("parent_project.txt")) {
+    stop("parent_project.txt does not exist")
+  }
+  # read in parent project and xml file to be modified
+  newnode <- xml2::read_xml("parent_project.txt", from = "xml")
+  xml_file <- xml2::read_xml(paste0(here::here(), "/", edi_pkg, ".xml"), from = "xml")
+  
+  # replace existant project node
+  if (is.na(xml2::xml_find_first(xml_file, ".//project")) == FALSE) {
+    # find old project node
+    oldnode <- xml2::xml_find_first(xml_file, ".//project") # find project node
+    # replace with new project node
+    xml2::xml_replace(oldnode, newnode)
+    warning("<project> node already existed but was overwritten")
+  }
+  # insert new project node
+  if (is.na(xml2::xml_find_first(xml_file, ".//project")) == TRUE) {
+    # find methods node
+    methodsnode <- xml2::xml_find_first(xml_file, ".//methods")
+    # add project node after methods and before dataTable
+    xml2::xml_add_sibling(methodsnode, newnode, where = "after")
+  }
+  # validate script
+  if (EML::eml_validate(xml_file) == FALSE) {
+    warning("XML document not valid")
+  }
+  # return(xml_file)
+  xml2::write_xml(xml_file, paste0(here::here(), "/", edi_pkg, ".xml"))
 }
 
 merge_csv_directory <- function(dir) {
