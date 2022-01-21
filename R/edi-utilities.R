@@ -19,6 +19,7 @@ sheet_to_tsv <- function(excel.path, sheet.name, output.path) {
 
 #' takes user-provided Excel template and converts to formats needed by
 #' the EML assembly line
+#' @export
 excel_to_template <- function(metadata_path, edi_filename, rights, bbox=FALSE, other_info=FALSE) {
   # FIXME use an output directory rather than writing everything to the root directory
 
@@ -41,6 +42,7 @@ excel_to_template <- function(metadata_path, edi_filename, rights, bbox=FALSE, o
 
 # date, lat, and lon columns must be identified as input for this function
 # Compiles a list of geographic and temporal coverage
+#' @export
 data_coverage <- function(dates, lat, lon) {
   # Temporal coverage 
   # Will need this in make_eml YYYY-MM-DD
@@ -67,6 +69,7 @@ data_coverage <- function(dates, lat, lon) {
 # requires the existance of a parent_project.txt
 # input path to xml file
 
+#' @export
 project_insert <- function(edi_pkg) {
   if (!file.exists("parent_project.txt")) {
     stop("parent_project.txt does not exist")
@@ -98,6 +101,7 @@ project_insert <- function(edi_pkg) {
   xml2::write_xml(xml_file, paste0(here::here(), "/", edi_pkg, ".xml"))
 }
 
+#' @export
 merge_csv_directory <- function(dir) {
   return(list.files(path=dir, full.names = TRUE) %>%
     lapply(readr::read_csv) %>%
