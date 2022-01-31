@@ -67,6 +67,26 @@ data_coverage <- function(dates, lat, lon) {
   return(list("startdate" = startdate_as_character, "enddate" = enddate_as_character,
               "North" = North, "East" = East, "South" = South, "West" = West))
 }
+
+spatiotemporal_coverage <- function(df) {
+  dates_as_date = as.Date(df$date)
+  coverage <- data_coverage(dates_as_date, df$latitude, df$longitude)
+  return(list("temporal" = c(coverage$startdate, coverage$enddate),
+              "geospatial" = c(coverage$North, coverage$East, coverage$South, coverage$West)))
+}
+
+#' @export
+temporal_coverage <- function(df) {
+  sc <- spatiotemporal_coverage(df)
+  return(sc$temporal)
+}
+
+#' @export
+geographic_coordinates <- function(df) {
+  sc <- spatiotemporal_coverage(df)
+  return(sc$geospatial)
+}
+
 # Insert Custom Project Node ------------
 # required packages: xml2
 
