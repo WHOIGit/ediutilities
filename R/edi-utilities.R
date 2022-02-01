@@ -68,23 +68,25 @@ data_coverage <- function(dates, lat, lon) {
               "North" = North, "East" = East, "South" = South, "West" = West))
 }
 
-spatiotemporal_coverage <- function(df) {
-  dates_as_date = as.Date(df$date)
-  coverage <- data_coverage(dates_as_date, df$latitude, df$longitude)
-  return(list("temporal" = c(coverage$startdate, coverage$enddate),
-              "geospatial" = c(coverage$North, coverage$East, coverage$South, coverage$West)))
+#' @export
+temporal_coverage <- function(dates) {
+  dates_as_date = as.Date(dates)
+  startdate <- min(dates_as_date, na.rm = TRUE)
+  enddate <- max(dates_as_date, na.rm = TRUE)
+  # temporal.coverage argument is expecting objects of 'character' class, not 'Date'
+  startdate_as_character <- as.character(startdate)
+  enddate_as_character <- as.character(enddate)
+  return(c(startdate_as_character, enddate_as_character))
 }
 
 #' @export
-temporal_coverage <- function(df) {
-  sc <- spatiotemporal_coverage(df)
-  return(sc$temporal)
-}
-
-#' @export
-geographic_coordinates <- function(df) {
-  sc <- spatiotemporal_coverage(df)
-  return(sc$geospatial)
+geographic_coordinates <- function(lats, lons) {
+  North <- round(max(lats, na.rm = TRUE), 5)
+  East <- round(max(lons, na.rm = TRUE), 5)
+  South <- round(min(lats, na.rm = TRUE), 5)
+  West <- round(min(lons, na.rm = TRUE), 5)
+  
+  return(c(North, East, South, West))
 }
 
 # Insert Custom Project Node ------------
