@@ -1,7 +1,7 @@
 #' @importFrom magrittr `%>%`
 #' @import readr dplyr readxl xml2
 #' @import EML EMLassemblyline
-#' @import rjson
+#' @import rjson rlog
 
 table_to_tsv <- function(table, output.path) {
   utils::write.table(table, output.path, quote=FALSE, na="", sep="\t", row.names=FALSE)
@@ -11,10 +11,14 @@ read_sheet <- function(excel.path, sheet.name) {
   return(readxl::read_excel(path=excel.path, sheet=sheet.name, na="NA"))
 }
 
+#' @export
 sheet_to_tsv <- function(excel.path, sheet.name, output.path) {
   if (sheet.name %in% readxl::excel_sheets(path=excel.path)) {
+    rlog::log_info(glue::glue('Converting {sheet.name} from {excel.path} to {output.path}'))
     table <- read_sheet(excel.path, sheet.name)
     table_to_tsv(table, output.path)
+  } else {
+    rlog::log_warn(glue::glue('{sheet.name} not found in {excel.path}; this may be expected'))
   }
 }
 
@@ -39,6 +43,7 @@ excel_to_template <- function(metadata_path, edi_filename, rights, bbox=FALSE, o
   # if there is no additional information (default), eliminate the template
   # TODO determine if this is necessary
   if(isFALSE(other_info)) {
+    rlog::log_info('other_info is FALSE; deleting additional_info.txt')
     unlink(here::here("additional_info.txt"))
   }
 }
@@ -99,6 +104,7 @@ geographic_coordinates <- function(lats, lons) {
 #' @export
 project_insert <- function(edi_pkg) {
   if (!file.exists("parent_project.txt")) {
+    rlog::log_fatal('parent_project.txt does not exist')
     stop("parent_project.txt does not exist")
   }
   # read in parent project and xml file to be modified
@@ -111,7 +117,7 @@ project_insert <- function(edi_pkg) {
     oldnode <- xml2::xml_find_first(xml_file, ".//project") # find project node
     # replace with new project node
     xml2::xml_replace(oldnode, newnode)
-    warning("<project> node already existed but was overwritten")
+    rlog::log_warn("<project> node already existed but was overwritten")
   }
   # insert new project node
   if (is.na(xml2::xml_find_first(xml_file, ".//project")) == TRUE) {
@@ -122,7 +128,7 @@ project_insert <- function(edi_pkg) {
   }
   # validate script
   if (EML::eml_validate(xml_file) == FALSE) {
-    warning("XML document not valid")
+    rlog::log_warn("EML document is not schema-valid XML")
   }
   # return(xml_file)
   xml2::write_xml(xml_file, paste0(here::here(), "/", edi_pkg, ".xml"))
@@ -139,6 +145,7 @@ merge_csv_directory <- function(dir) {
 
 #' @export
 api_list_cruises <- function() {
+  rlog::log_info('reading list of cruises from API')
   return(rjson::fromJSON(file="https://nes-lter-data.whoi.edu/api/cruises")$cruises)
 }
 
@@ -177,6 +184,7 @@ read_from_api <- function(type, cruises) {
   # case: more than one cruise given
   if (length(cruises) > 1) {
     # begin compilation  
+    rlog::log_info(glue::glue('reading {urls[1]} ...'))
     prev_cruise <- readr::read_csv(urls[1])
     
     if (isFALSE("cruise" %in% names(prev_cruise))) {
@@ -186,6 +194,7 @@ read_from_api <- function(type, cruises) {
     # loop through urls to compile cruise data into one file
     for (k in 2:length(urls)){
       # read in data per cruise
+      rlog::log_info(glue::glue('reading {urls[k]} ...'))
       next_cruise <- readr::read_csv(urls[k])
       
       if (isFALSE("cruise" %in% names(next_cruise))) {
@@ -204,6 +213,7 @@ read_from_api <- function(type, cruises) {
     
     # case: only one cruise is given
   } else {
+    rlog::log_info(glue::glue('readng {length(url)} urls ...'))
     all <- readr::read_csv(urls)
     return(all)
   }
