@@ -2,6 +2,7 @@
 #' @import readr dplyr readxl xml2
 #' @import EML EMLassemblyline
 #' @import rjson rlog
+#' @importFrom dplyr bind_rows
 
 table_to_tsv <- function(table, output.path) {
   utils::write.table(table, output.path, quote=FALSE, na="", sep="\t", row.names=FALSE)
@@ -138,7 +139,7 @@ project_insert <- function(edi_pkg) {
 merge_csv_directory <- function(dir) {
   return(list.files(path=dir, full.names = TRUE) %>%
     lapply(readr::read_csv) %>%
-    dplyr::bind_rows)
+    bind_rows)
 }
 
 # interacting with the NES-LTER REST API
