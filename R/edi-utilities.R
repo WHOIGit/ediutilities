@@ -3,6 +3,7 @@
 #' @import EML EMLassemblyline
 #' @import rjson rlog
 #' @importFrom dplyr bind_rows
+#' @import maps ggplot2
 
 table_to_tsv <- function(table, output.path) {
   utils::write.table(table, output.path, quote=FALSE, na="", sep="\t", row.names=FALSE)
@@ -218,4 +219,22 @@ read_from_api <- function(type, cruises) {
     all <- readr::read_csv(urls)
     return(all)
   }
+}
+
+#' @export
+map_locs <- function(df, xvar = "longitude", yvar = "latitude", colorvar = "cruise", region = "shelf") {
+  if (region == "transect") {
+    nes_region <- map_data("state") %>% filter(long > -72 & lat < 42)
+  }
+  if (region == "shelf") {
+    nes_region <- map_data("state") %>% filter(long > -77)
+  } 
+  
+  # Map given coordinates
+  ggplot(df, mapping = aes_string(x = xvar, y = yvar, color = colorvar)) +
+    geom_point(size = 1) + 
+    geom_polygon(data = nes_region, mapping = aes(x = long, y = lat, group = group),
+                 fill = NA, color = "grey50") +
+    coord_fixed(1.3) +
+    theme_classic()
 }
