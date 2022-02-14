@@ -10,7 +10,7 @@ table_to_tsv <- function(table, output.path) {
 }
 
 read_sheet <- function(excel.path, sheet.name) {
-  return(readxl::read_excel(path=excel.path, sheet=sheet.name, na="NA"))
+  return(readxl::read_excel(path=excel.path, sheet=sheet.name))
 }
 
 #' @export
