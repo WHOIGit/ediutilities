@@ -238,3 +238,18 @@ map_locs <- function(df, xvar = "longitude", yvar = "latitude", colorvar = "crui
     coord_fixed(1.3) +
     theme_classic()
 }
+
+#' @export
+map_values <- function(x, from, to, warn_missing=TRUE) {
+  # equivalent to plyr::mapvalues
+  if(warn_missing) {
+    diff <- setdiff(from, x)
+    if(length(diff) > 0) {
+      message(paste('missing value from source data:', diff, '\n'))
+    }
+  }
+  mapidx <- match(x, from)
+  mapidxNA  <- is.na(mapidx)
+  x[!mapidxNA] <- to[mapidx[!mapidxNA]]
+  return(x)
+}
