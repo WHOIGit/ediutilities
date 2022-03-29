@@ -104,13 +104,13 @@ geographic_coordinates <- function(lats, lons) {
 # input path to xml file
 
 #' @export
-project_insert <- function(edi_pkg) {
-  if (!file.exists("parent_project.txt")) {
-    rlog::log_fatal('parent_project.txt does not exist')
-    stop("parent_project.txt does not exist")
+project_insert <- function(edi_pkg, filename='parent_project.txt') {
+  if (!file.exists(filename)) {
+    rlog::log_fatal('parent project file does not exist')
+    stop("parent project file does not exist")
   }
   # read in parent project and xml file to be modified
-  newnode <- xml2::read_xml("parent_project.txt", from = "xml")
+  newnode <- xml2::read_xml(filename, from = "xml")
   xml_file <- xml2::read_xml(paste0(here::here(), "/", edi_pkg, ".xml"), from = "xml")
   
   # replace existant project node
