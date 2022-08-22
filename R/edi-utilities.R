@@ -27,26 +27,32 @@ sheet_to_tsv <- function(excel.path, sheet.name, output.path) {
 #' takes user-provided Excel template and converts to formats needed by
 #' the EML assembly line
 #' @export
-excel_to_template <- function(metadata_path, edi_filename, rights, bbox=FALSE, other_info=FALSE) {
-  # FIXME use an output directory rather than writing everything to the root directory
+excel_to_template <- function(metadata_path, edi_filename, rights, bbox=FALSE, other_info=FALSE, output_path=FALSE) {
 
   excel_path = glue::glue('{metadata_path}.xlsx')
 
-  sheet_to_tsv(excel_path, 'ColumnHeaders', glue::glue('attributes_{edi_filename}.txt'))
-  sheet_to_tsv(excel_path, 'Personnel', 'personnel.txt')
-  sheet_to_tsv(excel_path, 'Keywords', 'keywords.txt')
-  sheet_to_tsv(excel_path, 'CategoricalVariables', glue::glue('catvars_{edi_filename}.txt'))
-  sheet_to_tsv(excel_path, 'CustomUnits', 'custom_units.txt')
+  if(isFALSE(output_path)) {
+    output_path_prefix <- ""
+  } else {
+    output_path_prefix <- glue::glue(output_path, "/")
+    rlog::log_info(glue::glue("writing output templates to {output_path}"))
+  }
+
+  sheet_to_tsv(excel_path, 'ColumnHeaders', glue::glue(output_path_prefix, 'attributes_{edi_filename}.txt'))
+  sheet_to_tsv(excel_path, 'Personnel', glue::glue(output_path_prefix, 'personnel.txt'))
+  sheet_to_tsv(excel_path, 'Keywords', glue::glue(output_path_prefix, 'keywords.txt'))
+  sheet_to_tsv(excel_path, 'CategoricalVariables', glue::glue(output_path_prefix, 'catvars_{edi_filename}.txt'))
+  sheet_to_tsv(excel_path, 'CustomUnits', glue::glue(output_path_prefix, 'custom_units.txt'))
 
   # Import abstract and methods
-  EMLassemblyline::template_core_metadata(path = here::here(), license = rights)
+  EMLassemblyline::template_core_metadata(path = output_path, license = rights)
   # this will not overwrite existing files
 
   # if there is no additional information (default), eliminate the template
   # TODO determine if this is necessary
   if(isFALSE(other_info)) {
     rlog::log_info('other_info is FALSE; deleting additional_info.txt')
-    unlink(here::here("additional_info.txt"))
+    unlink(glue::glue(output_path_prefix, "additional_info.txt"))
   }
 }
 

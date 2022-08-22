@@ -1,7 +1,7 @@
 Package: ediutilities
 Type: Package
 Title: Utilities For Working with the EMLAssemblyline Package
-Version: 0.8.0
+Version: 0.9.0
 Author: Joe Futrelle, Jaxine Wolfe
 Maintainer: Joe Futrelle <jfutrelle@whoi.edu>
 Description: Generates input for EML assembly line from templates
