@@ -24,22 +24,47 @@ sheet_to_tsv <- function(excel.path, sheet.name, output.path) {
   }
 }
 
+select_rows_by_column_values <- function(data_table, column, values) {
+  column_as_factor <- factor(data_table[[column]], values)
+  output_table <- data_table[order(column_as_factor), ]
+  output_table <- head(output_table, length(values))
+  return(output_table)
+}
+
+#' @export
+generate_attribute_tsv <- function(excel_path, columns, output_path) {
+  headers_table <- read_sheet(excel_path, "ColumnHeaders")
+  output_table <- select_rows_by_column_values(headers_table, "attributeName", columns)
+  table_to_tsv(output_table, output_path)
+}
+
+
 #' takes user-provided Excel template and converts to formats needed by
 #' the EML assembly line
 #' @export
-excel_to_template <- function(metadata_path, edi_filename, rights, bbox=FALSE, other_info=FALSE, output_path=FALSE) {
+excel_to_template <- function(metadata_path, edi_filename, rights,
+                              columns=FALSE, data_table=FALSE, bbox=FALSE,
+                              other_info=FALSE, output_path=FALSE) {
 
   excel_path = glue::glue('{metadata_path}.xlsx')
 
   if(isFALSE(output_path)) {
-    output_path_prefix <- ""
-  } else {
-    output_path_prefix <- glue::glue(output_path, "/")
-    rlog::log_info(glue::glue("writing output templates to {output_path}"))
+    output_path <- here::here()
   }
+  output_path_prefix <- glue::glue(output_path, "/")
+  
+  rlog::log_info(glue::glue("writing output templates to {output_path}"))
 
-  sheet_to_tsv(excel_path, 'ColumnHeaders', glue::glue(output_path_prefix, 'attributes_{edi_filename}.txt'))
-  sheet_to_tsv(excel_path, 'Personnel', glue::glue(output_path_prefix, 'personnel.txt'))
+  attributes_outpath = glue::glue(output_path_prefix, 'attributes_{edi_filename}.txt')
+  if(isFALSE(columns) && isFALSE(data_table)) {
+    sheet_to_tsv(excel_path, 'ColumnHeaders', attributes_outpath)
+  } else {
+    if(isFALSE(columns)) {
+      columns <- colnames(data_table)
+    }
+    generate_attribute_tsv(excel_path, columns, attributes_outpath)
+  }
+  
   sheet_to_tsv(excel_path, 'Keywords', glue::glue(output_path_prefix, 'keywords.txt'))
   sheet_to_tsv(excel_path, 'CategoricalVariables', glue::glue(output_path_prefix, 'catvars_{edi_filename}.txt'))
   sheet_to_tsv(excel_path, 'CustomUnits', glue::glue(output_path_prefix, 'custom_units.txt'))

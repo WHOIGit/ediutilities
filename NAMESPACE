@@ -3,6 +3,7 @@
 export(api_list_cruises)
 export(data_coverage)
 export(excel_to_template)
+export(generate_attribute_tsv)
 export(geographic_coordinates)
 export(map_locs)
 export(map_values)
