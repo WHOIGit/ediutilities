@@ -68,6 +68,7 @@ excel_to_template <- function(metadata_path, edi_filename, rights,
   sheet_to_tsv(excel_path, 'Keywords', glue::glue(output_path_prefix, 'keywords.txt'))
   sheet_to_tsv(excel_path, 'CategoricalVariables', glue::glue(output_path_prefix, 'catvars_{edi_filename}.txt'))
   sheet_to_tsv(excel_path, 'CustomUnits', glue::glue(output_path_prefix, 'custom_units.txt'))
+  sheet_to_tsv(excel_path, 'Personnel', glue::glue(output_path_prefix, 'personnel.txt'))
 
   # Import abstract and methods
   EMLassemblyline::template_core_metadata(path = output_path, license = rights)
