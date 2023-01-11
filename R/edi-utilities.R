@@ -44,7 +44,7 @@ generate_attribute_tsv <- function(excel_path, columns, output_path) {
 #' @export
 excel_to_template <- function(metadata_path, edi_filename, rights,
                               columns=FALSE, data_table=FALSE, bbox=FALSE,
-                              other_info=FALSE, output_path=FALSE) {
+                              output_path=FALSE) {
 
   excel_path = glue::glue('{metadata_path}.xlsx')
 
@@ -73,13 +73,6 @@ excel_to_template <- function(metadata_path, edi_filename, rights,
   # Import abstract and methods
   EMLassemblyline::template_core_metadata(path = output_path, license = rights)
   # this will not overwrite existing files
-
-  # if there is no additional information (default), eliminate the template
-  # TODO determine if this is necessary
-  if(isFALSE(other_info)) {
-    rlog::log_info('other_info is FALSE; deleting additional_info.txt')
-    unlink(glue::glue(output_path_prefix, "additional_info.txt"))
-  }
 }
 
 # Define Coverage for make_eml ----------
