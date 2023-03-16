@@ -43,7 +43,7 @@ jobs:
           echo $VERSION
           VERSION_NUM=$(echo $VERSION |  awk -F'[.]' '{print $2}')
           echo $VERSION_NUM
-          NEW_VERSION_NUM=expr $VERSION_NUM + 1
+          NEW_VERSION_NUM=$(($VERSION_NUM + 1))
           echo $NEW_VERSION_NUM
           sed -i -e "s/0.$VERSION_NUM.0/0.$NEW_VERSION_NUM.0/g" DESCRIPTION
           git add .
