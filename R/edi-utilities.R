@@ -44,7 +44,7 @@ generate_attribute_tsv <- function(excel_path, columns, output_path) {
 #' @export
 excel_to_template <- function(metadata_path, edi_filename, rights,
                               columns=FALSE, data_table=FALSE, bbox=FALSE,
-                              output_path=FALSE) {
+                              output_path=FALSE, file_type=".txt") {
 
   excel_path = glue::glue('{metadata_path}.xlsx')
 
@@ -71,7 +71,7 @@ excel_to_template <- function(metadata_path, edi_filename, rights,
   sheet_to_tsv(excel_path, 'Personnel', glue::glue(output_path_prefix, 'personnel.txt'))
 
   # Import abstract and methods
-  EMLassemblyline::template_core_metadata(path = output_path, license = rights)
+  EMLassemblyline::template_core_metadata(path = output_path, license = rights, file_type)
   # this will not overwrite existing files
 }
 
