@@ -46,6 +46,7 @@ jobs:
           NEW_VERSION_NUM=$(($VERSION_NUM + 1))
           echo $NEW_VERSION_NUM
           sed -i -e "s/0.$VERSION_NUM.0/0.$NEW_VERSION_NUM.0/g" DESCRIPTION
+          cat DESCRIPTION
           git add .
           git commit -m "increment version number"
-          git push
+          git push origin HEAD:<up-version-number>
