@@ -45,7 +45,7 @@ jobs:
           VERSION_NUM=$(echo $VERSION |  awk -F'[.]' '{print $2}')
           NEW_VERSION_NUM=$(($VERSION_NUM + 1))
           #sed -i '' -e "s/0.$VERSION_NUM.0/0.$NEW_VERSION_NUM.0/g" DESCRIPTION
-          sed -i 's/0.$VERSION_NUM.0/0.$NEW_VERSION_NUM.0/g' DESCRIPTION
+          sed -i '' 's/0.$VERSION_NUM.0/0.$NEW_VERSION_NUM.0/g' DESCRIPTION
           cat DESCRIPTION
           git add .
           git commit -m "increment version number"
