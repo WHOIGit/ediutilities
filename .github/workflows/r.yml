@@ -39,21 +39,15 @@ jobs:
         shell: Rscript {0}
       - name: Increment Version
         # For pull requests to main branch only
-        # if: contains(github.ref, 'main')
+        if: contains(github.ref, 'main')
         run: |
           VERSION=$(grep "Version:" DESCRIPTION | cut -f2- -d ' ')
           VERSION_NUM=$(echo $VERSION |  awk -F'[.]' '{print $2}')
           NEW_VERSION_NUM=$(($VERSION_NUM + 1))
-          echo $VERSION_NUM
-          echo $NEW_VERSION_NUM
-          cat DESCRIPTION
-          #sed -i -e 's/0.$VERSION_NUM.0/0.$NEW_VERSION_NUM.0/g' DESCRIPTION
-          #sed -i '' 's/0.$VERSION_NUM.0/0.$NEW_VERSION_NUM.0/g' DESCRIPTION
+          # mac osx sed replacement only works with the double quotes
           sed -i -e "s/0.$VERSION_NUM.0/0.$NEW_VERSION_NUM.0/g" DESCRIPTION
-          cat DESCRIPTION
-          ls
+          # mac osx sed needs to create a backup file - delete it here
           rm DESCRIPTION-e
-          ls
           git add .
           git commit -m "increment version number"
           git push
