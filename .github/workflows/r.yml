@@ -49,8 +49,9 @@ jobs:
           cat DESCRIPTION
           #sed -i -e 's/0.$VERSION_NUM.0/0.$NEW_VERSION_NUM.0/g' DESCRIPTION
           #sed -i '' 's/0.$VERSION_NUM.0/0.$NEW_VERSION_NUM.0/g' DESCRIPTION
-          gsed -i 's/0.$VERSION_NUM.0/0.$NEW_VERSION_NUM.0/g' DESCRIPTION
+          sed -i -e 's/0.$VERSION_NUM.0/0.$NEW_VERSION_NUM.0/g' DESCRIPTION
           cat DESCRIPTION
+          rm DESCRIPTION-e
           ls
           git add .
           git commit -m "increment version number"
