@@ -212,42 +212,33 @@ read_from_api <- function(type, cruises) {
   }
 
   ## Cruise Compilation ##
-  # case: more than one cruise given
-  if (length(cruises) > 1) {
-    # begin compilation  
-    rlog::log_info(glue::glue('reading {urls[1]} ...'))
-    prev_cruise <- readr::read_csv(urls[1])
+  # initialize list to store all data frames
+  all_list <- list()
+  
+  # loop through urls to read in cruise data
+  for (k in 1:length(urls)) {
+    # read in data per cruise
+    rlog::log_info(glue::glue('reading {urls[k]} ...'))
+    cruise_df <- readr::read_csv(urls[k])
     
-    if (isFALSE("cruise" %in% names(prev_cruise))) {
-      prev_cruise$cruise <- toupper(cruises[1])
+    # check if "cruise" column exists in data frame
+    if (isFALSE("cruise" %in% names(cruise_df))) {
+      cruise_df$cruise <- toupper(cruises[k])
     }
     
-    # loop through urls to compile cruise data into one file
-    for (k in 2:length(urls)){
-      # read in data per cruise
-      rlog::log_info(glue::glue('reading {urls[k]} ...'))
-      next_cruise <- readr::read_csv(urls[k])
-      
-      if (isFALSE("cruise" %in% names(next_cruise))) {
-        next_cruise$cruise <- toupper(cruises[k])
-      }
-      
-      # bind the next cruise to the compiled cruise dataset
-      all <- dplyr::bind_rows(prev_cruise, next_cruise)
-      
-      # if statment to reset the previous cruises until all cruises are read in
-      if(k < length(urls)) {
-        prev_cruise <- all
-      }
+    # check if "cast" column exists in data frame
+    if ("cast" %in% names(cruise_df)) {
+      cruise_df$cast <- as.character(cruise_df$cast)
     }
-    return(all)
     
-    # case: only one cruise is given
-  } else {
-    rlog::log_info(glue::glue('reading {length(url)} urls ...'))
-    all <- readr::read_csv(urls)
-    return(all)
+    # add cruise data to list
+    all_list[[k]] <- cruise_df
   }
+  
+  # combine all data frames into one using bind_rows
+  all <- dplyr::bind_rows(all_list)
+  
+  return(all)
 }
 
 #' @export
