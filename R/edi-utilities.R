@@ -70,6 +70,9 @@ excel_to_template <- function(metadata_path, edi_filename, rights,
   sheet_to_tsv(excel_path, 'CustomUnits', glue::glue(output_path_prefix, 'custom_units.txt'))
   sheet_to_tsv(excel_path, 'Personnel', glue::glue(output_path_prefix, 'personnel.txt'))
 
+  # need to update the rights in this file if they change
+  unlink("intellectual_rights.txt")
+  
   # Import abstract and methods
   EMLassemblyline::template_core_metadata(path = output_path, license = rights, file_type)
   # this will not overwrite existing files
