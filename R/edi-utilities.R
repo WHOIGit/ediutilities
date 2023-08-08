@@ -43,8 +43,8 @@ generate_attribute_tsv <- function(excel_path, columns, output_path) {
 #' the EML assembly line
 #' @export
 excel_to_template <- function(metadata_path, edi_filename, rights,
-                              columns=FALSE, data_table=FALSE, bbox=FALSE,
-                              output_path=FALSE, file_type=".txt") {
+                              columns=FALSE, data_table=FALSE, output_path=FALSE, 
+                              file_type=".txt", del_rights=TRUE) {
 
   excel_path = glue::glue('{metadata_path}.xlsx')
 
@@ -70,8 +70,12 @@ excel_to_template <- function(metadata_path, edi_filename, rights,
   sheet_to_tsv(excel_path, 'CustomUnits', glue::glue(output_path_prefix, 'custom_units.txt'))
   sheet_to_tsv(excel_path, 'Personnel', glue::glue(output_path_prefix, 'personnel.txt'))
 
-  # need to update the rights in this file if they change
-  unlink("intellectual_rights.txt")
+  # set del_rights to TRUE update the rights in this file if they change from CC0 to CCBY or vice versa
+  # set del_rights to FALSE in the case where using a data pkg that has another license and special notes
+  # are supplied
+  if (del_rights) {
+     unlink("intellectual_rights.txt")
+  }
   
   # Import abstract and methods
   EMLassemblyline::template_core_metadata(path = output_path, license = rights, file_type)
